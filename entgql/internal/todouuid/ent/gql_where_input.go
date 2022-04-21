@@ -18,6 +18,7 @@ package ent
 
 import (
 	"fmt"
+	"io"
 	"time"
 
 	"entgo.io/contrib/entgql/internal/todo/ent/schema/schematype"
@@ -26,6 +27,7 @@ import (
 	"entgo.io/contrib/entgql/internal/todouuid/ent/predicate"
 	"entgo.io/contrib/entgql/internal/todouuid/ent/todo"
 	"entgo.io/contrib/entgql/internal/todouuid/ent/user"
+	"github.com/99designs/gqlgen/graphql"
 	"github.com/google/uuid"
 )
 
@@ -360,6 +362,507 @@ func (i *CategoryWhereInput) P() (predicate.Category, error) {
 	}
 }
 
+func unmarshalGQLSlideCategoryWhereInput(v interface{}) (r []*CategoryWhereInput, err error) {
+	s := graphql.CoerceList(v)
+	r = make([]*CategoryWhereInput, len(s))
+	for i, o := range s {
+		r[i] = new(CategoryWhereInput)
+		if err = r[i].UnmarshalGQL(o); err != nil {
+			return nil, err
+		}
+	}
+	return
+}
+
+// UnmarshalGQL implements the graphql.Unmarshaler interface
+func (i *CategoryWhereInput) UnmarshalGQL(obj interface{}) (err error) {
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "not":
+			i.Not = new(CategoryWhereInput)
+			if err = i.Not.UnmarshalGQL(v); err != nil {
+				return err
+			}
+		case "or":
+			i.Or, err = unmarshalGQLSlideCategoryWhereInput(v)
+			if err != nil {
+				return err
+			}
+		case "and":
+			i.And, err = unmarshalGQLSlideCategoryWhereInput(v)
+			if err != nil {
+				return err
+			}
+		// "id" field predicates.
+		case "id":
+			g, err := (v)
+			if err != nil {
+				return err
+			}
+			t := (uuid.UUID)(g)
+
+			i.ID = &t
+		case "idNEQ":
+			g, err := (v)
+			if err != nil {
+				return err
+			}
+			t := (uuid.UUID)(g)
+
+			i.IDNEQ = &t
+		case "idIn":
+			i.IDIn = make([]uuid.UUID, len(v.([]interface{})))
+			for idx, o := range v.([]interface{}) {
+				g, err := (o)
+				if err != nil {
+					return err
+				}
+				t := (uuid.UUID)(g)
+
+				i.IDIn[idx] = t
+			}
+		case "idNotIn":
+			i.IDNotIn = make([]uuid.UUID, len(v.([]interface{})))
+			for idx, o := range v.([]interface{}) {
+				g, err := (o)
+				if err != nil {
+					return err
+				}
+				t := (uuid.UUID)(g)
+
+				i.IDNotIn[idx] = t
+			}
+		case "idGT":
+			g, err := (v)
+			if err != nil {
+				return err
+			}
+			t := (uuid.UUID)(g)
+
+			i.IDGT = &t
+		case "idGTE":
+			g, err := (v)
+			if err != nil {
+				return err
+			}
+			t := (uuid.UUID)(g)
+
+			i.IDGTE = &t
+		case "idLT":
+			g, err := (v)
+			if err != nil {
+				return err
+			}
+			t := (uuid.UUID)(g)
+
+			i.IDLT = &t
+		case "idLTE":
+			g, err := (v)
+			if err != nil {
+				return err
+			}
+			t := (uuid.UUID)(g)
+
+			i.IDLTE = &t
+		// "text" field predicates.
+		case "text":
+			t, err := graphql.UnmarshalString(v)
+			if err != nil {
+				return err
+			}
+
+			i.Text = &t
+		case "textNEQ":
+			t, err := graphql.UnmarshalString(v)
+			if err != nil {
+				return err
+			}
+
+			i.TextNEQ = &t
+		case "textIn":
+			i.TextIn = make([]string, len(v.([]interface{})))
+			for idx, o := range v.([]interface{}) {
+				t, err := graphql.UnmarshalString(o)
+				if err != nil {
+					return err
+				}
+
+				i.TextIn[idx] = t
+			}
+		case "textNotIn":
+			i.TextNotIn = make([]string, len(v.([]interface{})))
+			for idx, o := range v.([]interface{}) {
+				t, err := graphql.UnmarshalString(o)
+				if err != nil {
+					return err
+				}
+
+				i.TextNotIn[idx] = t
+			}
+		case "textGT":
+			t, err := graphql.UnmarshalString(v)
+			if err != nil {
+				return err
+			}
+
+			i.TextGT = &t
+		case "textGTE":
+			t, err := graphql.UnmarshalString(v)
+			if err != nil {
+				return err
+			}
+
+			i.TextGTE = &t
+		case "textLT":
+			t, err := graphql.UnmarshalString(v)
+			if err != nil {
+				return err
+			}
+
+			i.TextLT = &t
+		case "textLTE":
+			t, err := graphql.UnmarshalString(v)
+			if err != nil {
+				return err
+			}
+
+			i.TextLTE = &t
+		case "textContains":
+			t, err := graphql.UnmarshalString(v)
+			if err != nil {
+				return err
+			}
+
+			i.TextContains = &t
+		case "textHasPrefix":
+			t, err := graphql.UnmarshalString(v)
+			if err != nil {
+				return err
+			}
+
+			i.TextHasPrefix = &t
+		case "textHasSuffix":
+			t, err := graphql.UnmarshalString(v)
+			if err != nil {
+				return err
+			}
+
+			i.TextHasSuffix = &t
+		case "textEqualFold":
+			t, err := graphql.UnmarshalString(v)
+			if err != nil {
+				return err
+			}
+
+			i.TextEqualFold = &t
+		case "textContainsFold":
+			t, err := graphql.UnmarshalString(v)
+			if err != nil {
+				return err
+			}
+
+			i.TextContainsFold = &t
+		// "status" field predicates.
+		case "status":
+			t := new(category.Status)
+			if err = t.UnmarshalGQL(v); err != nil {
+				return err
+			}
+
+			i.Status = t
+		case "statusNEQ":
+			t := new(category.Status)
+			if err = t.UnmarshalGQL(v); err != nil {
+				return err
+			}
+
+			i.StatusNEQ = t
+		case "statusIn":
+			i.StatusIn = make([]category.Status, len(v.([]interface{})))
+			for idx, o := range v.([]interface{}) {
+				t := new(category.Status)
+				if err = t.UnmarshalGQL(o); err != nil {
+					return err
+				}
+
+				i.StatusIn[idx] = *t
+			}
+		case "statusNotIn":
+			i.StatusNotIn = make([]category.Status, len(v.([]interface{})))
+			for idx, o := range v.([]interface{}) {
+				t := new(category.Status)
+				if err = t.UnmarshalGQL(o); err != nil {
+					return err
+				}
+
+				i.StatusNotIn[idx] = *t
+			}
+		// "config" field predicates.
+		case "config":
+			g, err := (v)
+			if err != nil {
+				return err
+			}
+			t := (*schematype.CategoryConfig)(g)
+
+			i.Config = t
+		case "configNEQ":
+			g, err := (v)
+			if err != nil {
+				return err
+			}
+			t := (*schematype.CategoryConfig)(g)
+
+			i.ConfigNEQ = t
+		case "configIn":
+			i.ConfigIn = make([]*schematype.CategoryConfig, len(v.([]interface{})))
+			for idx, o := range v.([]interface{}) {
+				g, err := (o)
+				if err != nil {
+					return err
+				}
+				t := (*schematype.CategoryConfig)(g)
+
+				i.ConfigIn[idx] = *t
+			}
+		case "configNotIn":
+			i.ConfigNotIn = make([]*schematype.CategoryConfig, len(v.([]interface{})))
+			for idx, o := range v.([]interface{}) {
+				g, err := (o)
+				if err != nil {
+					return err
+				}
+				t := (*schematype.CategoryConfig)(g)
+
+				i.ConfigNotIn[idx] = *t
+			}
+		case "configGT":
+			g, err := (v)
+			if err != nil {
+				return err
+			}
+			t := (*schematype.CategoryConfig)(g)
+
+			i.ConfigGT = t
+		case "configGTE":
+			g, err := (v)
+			if err != nil {
+				return err
+			}
+			t := (*schematype.CategoryConfig)(g)
+
+			i.ConfigGTE = t
+		case "configLT":
+			g, err := (v)
+			if err != nil {
+				return err
+			}
+			t := (*schematype.CategoryConfig)(g)
+
+			i.ConfigLT = t
+		case "configLTE":
+			g, err := (v)
+			if err != nil {
+				return err
+			}
+			t := (*schematype.CategoryConfig)(g)
+
+			i.ConfigLTE = t
+		case "configIsNil":
+			i.ConfigIsNil, err = graphql.UnmarshalBoolean(v)
+			if err != nil {
+				return err
+			}
+		case "configNotNil":
+			i.ConfigNotNil, err = graphql.UnmarshalBoolean(v)
+			if err != nil {
+				return err
+			}
+		// "duration" field predicates.
+		case "duration":
+			g, err := graphql.UnmarshalInt64(v)
+			if err != nil {
+				return err
+			}
+			t := (time.Duration)(g)
+
+			i.Duration = &t
+		case "durationNEQ":
+			g, err := graphql.UnmarshalInt64(v)
+			if err != nil {
+				return err
+			}
+			t := (time.Duration)(g)
+
+			i.DurationNEQ = &t
+		case "durationIn":
+			i.DurationIn = make([]time.Duration, len(v.([]interface{})))
+			for idx, o := range v.([]interface{}) {
+				g, err := graphql.UnmarshalInt64(o)
+				if err != nil {
+					return err
+				}
+				t := (time.Duration)(g)
+
+				i.DurationIn[idx] = t
+			}
+		case "durationNotIn":
+			i.DurationNotIn = make([]time.Duration, len(v.([]interface{})))
+			for idx, o := range v.([]interface{}) {
+				g, err := graphql.UnmarshalInt64(o)
+				if err != nil {
+					return err
+				}
+				t := (time.Duration)(g)
+
+				i.DurationNotIn[idx] = t
+			}
+		case "durationGT":
+			g, err := graphql.UnmarshalInt64(v)
+			if err != nil {
+				return err
+			}
+			t := (time.Duration)(g)
+
+			i.DurationGT = &t
+		case "durationGTE":
+			g, err := graphql.UnmarshalInt64(v)
+			if err != nil {
+				return err
+			}
+			t := (time.Duration)(g)
+
+			i.DurationGTE = &t
+		case "durationLT":
+			g, err := graphql.UnmarshalInt64(v)
+			if err != nil {
+				return err
+			}
+			t := (time.Duration)(g)
+
+			i.DurationLT = &t
+		case "durationLTE":
+			g, err := graphql.UnmarshalInt64(v)
+			if err != nil {
+				return err
+			}
+			t := (time.Duration)(g)
+
+			i.DurationLTE = &t
+		case "durationIsNil":
+			i.DurationIsNil, err = graphql.UnmarshalBoolean(v)
+			if err != nil {
+				return err
+			}
+		case "durationNotNil":
+			i.DurationNotNil, err = graphql.UnmarshalBoolean(v)
+			if err != nil {
+				return err
+			}
+		// "count" field predicates.
+		case "count":
+			t, err := graphql.UnmarshalUint64(v)
+			if err != nil {
+				return err
+			}
+
+			i.Count = &t
+		case "countNEQ":
+			t, err := graphql.UnmarshalUint64(v)
+			if err != nil {
+				return err
+			}
+
+			i.CountNEQ = &t
+		case "countIn":
+			i.CountIn = make([]uint64, len(v.([]interface{})))
+			for idx, o := range v.([]interface{}) {
+				t, err := graphql.UnmarshalUint64(o)
+				if err != nil {
+					return err
+				}
+
+				i.CountIn[idx] = t
+			}
+		case "countNotIn":
+			i.CountNotIn = make([]uint64, len(v.([]interface{})))
+			for idx, o := range v.([]interface{}) {
+				t, err := graphql.UnmarshalUint64(o)
+				if err != nil {
+					return err
+				}
+
+				i.CountNotIn[idx] = t
+			}
+		case "countGT":
+			t, err := graphql.UnmarshalUint64(v)
+			if err != nil {
+				return err
+			}
+
+			i.CountGT = &t
+		case "countGTE":
+			t, err := graphql.UnmarshalUint64(v)
+			if err != nil {
+				return err
+			}
+
+			i.CountGTE = &t
+		case "countLT":
+			t, err := graphql.UnmarshalUint64(v)
+			if err != nil {
+				return err
+			}
+
+			i.CountLT = &t
+		case "countLTE":
+			t, err := graphql.UnmarshalUint64(v)
+			if err != nil {
+				return err
+			}
+
+			i.CountLTE = &t
+		case "countIsNil":
+			i.CountIsNil, err = graphql.UnmarshalBoolean(v)
+			if err != nil {
+				return err
+			}
+		case "countNotNil":
+			i.CountNotNil, err = graphql.UnmarshalBoolean(v)
+			if err != nil {
+				return err
+			}
+
+		// "todos" edge predicates.
+		case "hasTodos":
+			t, err := graphql.UnmarshalBoolean(v)
+			if err != nil {
+				return err
+			}
+			i.HasTodos = &t
+		case "hasTodosWith":
+			i.HasTodosWith, err = unmarshalGQLSlideTodoWhereInput(v)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+// MarshalGQL implements the graphql.Marshaler interface
+//
+// This function should never be called because our object is Input.
+// It exists to make GQLGen aware of objects has custom unmarshal function
+func (i CategoryWhereInput) MarshalGQL(w io.Writer) {
+	panic("CategoryWhereInput.MarshalGQL not implemented")
+}
+
 // GroupWhereInput represents a where input for filtering Group queries.
 type GroupWhereInput struct {
 	Not *GroupWhereInput   `json:"not,omitempty"`
@@ -545,6 +1048,237 @@ func (i *GroupWhereInput) P() (predicate.Group, error) {
 	default:
 		return group.And(predicates...), nil
 	}
+}
+
+func unmarshalGQLSlideGroupWhereInput(v interface{}) (r []*GroupWhereInput, err error) {
+	s := graphql.CoerceList(v)
+	r = make([]*GroupWhereInput, len(s))
+	for i, o := range s {
+		r[i] = new(GroupWhereInput)
+		if err = r[i].UnmarshalGQL(o); err != nil {
+			return nil, err
+		}
+	}
+	return
+}
+
+// UnmarshalGQL implements the graphql.Unmarshaler interface
+func (i *GroupWhereInput) UnmarshalGQL(obj interface{}) (err error) {
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "not":
+			i.Not = new(GroupWhereInput)
+			if err = i.Not.UnmarshalGQL(v); err != nil {
+				return err
+			}
+		case "or":
+			i.Or, err = unmarshalGQLSlideGroupWhereInput(v)
+			if err != nil {
+				return err
+			}
+		case "and":
+			i.And, err = unmarshalGQLSlideGroupWhereInput(v)
+			if err != nil {
+				return err
+			}
+		// "id" field predicates.
+		case "id":
+			g, err := (v)
+			if err != nil {
+				return err
+			}
+			t := (uuid.UUID)(g)
+
+			i.ID = &t
+		case "idNEQ":
+			g, err := (v)
+			if err != nil {
+				return err
+			}
+			t := (uuid.UUID)(g)
+
+			i.IDNEQ = &t
+		case "idIn":
+			i.IDIn = make([]uuid.UUID, len(v.([]interface{})))
+			for idx, o := range v.([]interface{}) {
+				g, err := (o)
+				if err != nil {
+					return err
+				}
+				t := (uuid.UUID)(g)
+
+				i.IDIn[idx] = t
+			}
+		case "idNotIn":
+			i.IDNotIn = make([]uuid.UUID, len(v.([]interface{})))
+			for idx, o := range v.([]interface{}) {
+				g, err := (o)
+				if err != nil {
+					return err
+				}
+				t := (uuid.UUID)(g)
+
+				i.IDNotIn[idx] = t
+			}
+		case "idGT":
+			g, err := (v)
+			if err != nil {
+				return err
+			}
+			t := (uuid.UUID)(g)
+
+			i.IDGT = &t
+		case "idGTE":
+			g, err := (v)
+			if err != nil {
+				return err
+			}
+			t := (uuid.UUID)(g)
+
+			i.IDGTE = &t
+		case "idLT":
+			g, err := (v)
+			if err != nil {
+				return err
+			}
+			t := (uuid.UUID)(g)
+
+			i.IDLT = &t
+		case "idLTE":
+			g, err := (v)
+			if err != nil {
+				return err
+			}
+			t := (uuid.UUID)(g)
+
+			i.IDLTE = &t
+		// "name" field predicates.
+		case "name":
+			t, err := graphql.UnmarshalString(v)
+			if err != nil {
+				return err
+			}
+
+			i.Name = &t
+		case "nameNEQ":
+			t, err := graphql.UnmarshalString(v)
+			if err != nil {
+				return err
+			}
+
+			i.NameNEQ = &t
+		case "nameIn":
+			i.NameIn = make([]string, len(v.([]interface{})))
+			for idx, o := range v.([]interface{}) {
+				t, err := graphql.UnmarshalString(o)
+				if err != nil {
+					return err
+				}
+
+				i.NameIn[idx] = t
+			}
+		case "nameNotIn":
+			i.NameNotIn = make([]string, len(v.([]interface{})))
+			for idx, o := range v.([]interface{}) {
+				t, err := graphql.UnmarshalString(o)
+				if err != nil {
+					return err
+				}
+
+				i.NameNotIn[idx] = t
+			}
+		case "nameGT":
+			t, err := graphql.UnmarshalString(v)
+			if err != nil {
+				return err
+			}
+
+			i.NameGT = &t
+		case "nameGTE":
+			t, err := graphql.UnmarshalString(v)
+			if err != nil {
+				return err
+			}
+
+			i.NameGTE = &t
+		case "nameLT":
+			t, err := graphql.UnmarshalString(v)
+			if err != nil {
+				return err
+			}
+
+			i.NameLT = &t
+		case "nameLTE":
+			t, err := graphql.UnmarshalString(v)
+			if err != nil {
+				return err
+			}
+
+			i.NameLTE = &t
+		case "nameContains":
+			t, err := graphql.UnmarshalString(v)
+			if err != nil {
+				return err
+			}
+
+			i.NameContains = &t
+		case "nameHasPrefix":
+			t, err := graphql.UnmarshalString(v)
+			if err != nil {
+				return err
+			}
+
+			i.NameHasPrefix = &t
+		case "nameHasSuffix":
+			t, err := graphql.UnmarshalString(v)
+			if err != nil {
+				return err
+			}
+
+			i.NameHasSuffix = &t
+		case "nameEqualFold":
+			t, err := graphql.UnmarshalString(v)
+			if err != nil {
+				return err
+			}
+
+			i.NameEqualFold = &t
+		case "nameContainsFold":
+			t, err := graphql.UnmarshalString(v)
+			if err != nil {
+				return err
+			}
+
+			i.NameContainsFold = &t
+
+		// "users" edge predicates.
+		case "hasUsers":
+			t, err := graphql.UnmarshalBoolean(v)
+			if err != nil {
+				return err
+			}
+			i.HasUsers = &t
+		case "hasUsersWith":
+			i.HasUsersWith, err = unmarshalGQLSlideUserWhereInput(v)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+// MarshalGQL implements the graphql.Marshaler interface
+//
+// This function should never be called because our object is Input.
+// It exists to make GQLGen aware of objects has custom unmarshal function
+func (i GroupWhereInput) MarshalGQL(w io.Writer) {
+	panic("GroupWhereInput.MarshalGQL not implemented")
 }
 
 // TodoWhereInput represents a where input for filtering Todo queries.
@@ -864,6 +1598,422 @@ func (i *TodoWhereInput) P() (predicate.Todo, error) {
 	}
 }
 
+func unmarshalGQLSlideTodoWhereInput(v interface{}) (r []*TodoWhereInput, err error) {
+	s := graphql.CoerceList(v)
+	r = make([]*TodoWhereInput, len(s))
+	for i, o := range s {
+		r[i] = new(TodoWhereInput)
+		if err = r[i].UnmarshalGQL(o); err != nil {
+			return nil, err
+		}
+	}
+	return
+}
+
+// UnmarshalGQL implements the graphql.Unmarshaler interface
+func (i *TodoWhereInput) UnmarshalGQL(obj interface{}) (err error) {
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "not":
+			i.Not = new(TodoWhereInput)
+			if err = i.Not.UnmarshalGQL(v); err != nil {
+				return err
+			}
+		case "or":
+			i.Or, err = unmarshalGQLSlideTodoWhereInput(v)
+			if err != nil {
+				return err
+			}
+		case "and":
+			i.And, err = unmarshalGQLSlideTodoWhereInput(v)
+			if err != nil {
+				return err
+			}
+		// "id" field predicates.
+		case "id":
+			g, err := (v)
+			if err != nil {
+				return err
+			}
+			t := (uuid.UUID)(g)
+
+			i.ID = &t
+		case "idNEQ":
+			g, err := (v)
+			if err != nil {
+				return err
+			}
+			t := (uuid.UUID)(g)
+
+			i.IDNEQ = &t
+		case "idIn":
+			i.IDIn = make([]uuid.UUID, len(v.([]interface{})))
+			for idx, o := range v.([]interface{}) {
+				g, err := (o)
+				if err != nil {
+					return err
+				}
+				t := (uuid.UUID)(g)
+
+				i.IDIn[idx] = t
+			}
+		case "idNotIn":
+			i.IDNotIn = make([]uuid.UUID, len(v.([]interface{})))
+			for idx, o := range v.([]interface{}) {
+				g, err := (o)
+				if err != nil {
+					return err
+				}
+				t := (uuid.UUID)(g)
+
+				i.IDNotIn[idx] = t
+			}
+		case "idGT":
+			g, err := (v)
+			if err != nil {
+				return err
+			}
+			t := (uuid.UUID)(g)
+
+			i.IDGT = &t
+		case "idGTE":
+			g, err := (v)
+			if err != nil {
+				return err
+			}
+			t := (uuid.UUID)(g)
+
+			i.IDGTE = &t
+		case "idLT":
+			g, err := (v)
+			if err != nil {
+				return err
+			}
+			t := (uuid.UUID)(g)
+
+			i.IDLT = &t
+		case "idLTE":
+			g, err := (v)
+			if err != nil {
+				return err
+			}
+			t := (uuid.UUID)(g)
+
+			i.IDLTE = &t
+		// "created_at" field predicates.
+		case "createdAt":
+			t, err := graphql.UnmarshalTime(v)
+			if err != nil {
+				return err
+			}
+
+			i.CreatedAt = &t
+		case "createdAtNEQ":
+			t, err := graphql.UnmarshalTime(v)
+			if err != nil {
+				return err
+			}
+
+			i.CreatedAtNEQ = &t
+		case "createdAtIn":
+			i.CreatedAtIn = make([]time.Time, len(v.([]interface{})))
+			for idx, o := range v.([]interface{}) {
+				t, err := graphql.UnmarshalTime(o)
+				if err != nil {
+					return err
+				}
+
+				i.CreatedAtIn[idx] = t
+			}
+		case "createdAtNotIn":
+			i.CreatedAtNotIn = make([]time.Time, len(v.([]interface{})))
+			for idx, o := range v.([]interface{}) {
+				t, err := graphql.UnmarshalTime(o)
+				if err != nil {
+					return err
+				}
+
+				i.CreatedAtNotIn[idx] = t
+			}
+		case "createdAtGT":
+			t, err := graphql.UnmarshalTime(v)
+			if err != nil {
+				return err
+			}
+
+			i.CreatedAtGT = &t
+		case "createdAtGTE":
+			t, err := graphql.UnmarshalTime(v)
+			if err != nil {
+				return err
+			}
+
+			i.CreatedAtGTE = &t
+		case "createdAtLT":
+			t, err := graphql.UnmarshalTime(v)
+			if err != nil {
+				return err
+			}
+
+			i.CreatedAtLT = &t
+		case "createdAtLTE":
+			t, err := graphql.UnmarshalTime(v)
+			if err != nil {
+				return err
+			}
+
+			i.CreatedAtLTE = &t
+		// "status" field predicates.
+		case "status":
+			t := new(todo.Status)
+			if err = t.UnmarshalGQL(v); err != nil {
+				return err
+			}
+
+			i.Status = t
+		case "statusNEQ":
+			t := new(todo.Status)
+			if err = t.UnmarshalGQL(v); err != nil {
+				return err
+			}
+
+			i.StatusNEQ = t
+		case "statusIn":
+			i.StatusIn = make([]todo.Status, len(v.([]interface{})))
+			for idx, o := range v.([]interface{}) {
+				t := new(todo.Status)
+				if err = t.UnmarshalGQL(o); err != nil {
+					return err
+				}
+
+				i.StatusIn[idx] = *t
+			}
+		case "statusNotIn":
+			i.StatusNotIn = make([]todo.Status, len(v.([]interface{})))
+			for idx, o := range v.([]interface{}) {
+				t := new(todo.Status)
+				if err = t.UnmarshalGQL(o); err != nil {
+					return err
+				}
+
+				i.StatusNotIn[idx] = *t
+			}
+		// "priority" field predicates.
+		case "priority":
+			t, err := graphql.UnmarshalInt(v)
+			if err != nil {
+				return err
+			}
+
+			i.Priority = &t
+		case "priorityNEQ":
+			t, err := graphql.UnmarshalInt(v)
+			if err != nil {
+				return err
+			}
+
+			i.PriorityNEQ = &t
+		case "priorityIn":
+			i.PriorityIn = make([]int, len(v.([]interface{})))
+			for idx, o := range v.([]interface{}) {
+				t, err := graphql.UnmarshalInt(o)
+				if err != nil {
+					return err
+				}
+
+				i.PriorityIn[idx] = t
+			}
+		case "priorityNotIn":
+			i.PriorityNotIn = make([]int, len(v.([]interface{})))
+			for idx, o := range v.([]interface{}) {
+				t, err := graphql.UnmarshalInt(o)
+				if err != nil {
+					return err
+				}
+
+				i.PriorityNotIn[idx] = t
+			}
+		case "priorityGT":
+			t, err := graphql.UnmarshalInt(v)
+			if err != nil {
+				return err
+			}
+
+			i.PriorityGT = &t
+		case "priorityGTE":
+			t, err := graphql.UnmarshalInt(v)
+			if err != nil {
+				return err
+			}
+
+			i.PriorityGTE = &t
+		case "priorityLT":
+			t, err := graphql.UnmarshalInt(v)
+			if err != nil {
+				return err
+			}
+
+			i.PriorityLT = &t
+		case "priorityLTE":
+			t, err := graphql.UnmarshalInt(v)
+			if err != nil {
+				return err
+			}
+
+			i.PriorityLTE = &t
+		// "text" field predicates.
+		case "text":
+			t, err := graphql.UnmarshalString(v)
+			if err != nil {
+				return err
+			}
+
+			i.Text = &t
+		case "textNEQ":
+			t, err := graphql.UnmarshalString(v)
+			if err != nil {
+				return err
+			}
+
+			i.TextNEQ = &t
+		case "textIn":
+			i.TextIn = make([]string, len(v.([]interface{})))
+			for idx, o := range v.([]interface{}) {
+				t, err := graphql.UnmarshalString(o)
+				if err != nil {
+					return err
+				}
+
+				i.TextIn[idx] = t
+			}
+		case "textNotIn":
+			i.TextNotIn = make([]string, len(v.([]interface{})))
+			for idx, o := range v.([]interface{}) {
+				t, err := graphql.UnmarshalString(o)
+				if err != nil {
+					return err
+				}
+
+				i.TextNotIn[idx] = t
+			}
+		case "textGT":
+			t, err := graphql.UnmarshalString(v)
+			if err != nil {
+				return err
+			}
+
+			i.TextGT = &t
+		case "textGTE":
+			t, err := graphql.UnmarshalString(v)
+			if err != nil {
+				return err
+			}
+
+			i.TextGTE = &t
+		case "textLT":
+			t, err := graphql.UnmarshalString(v)
+			if err != nil {
+				return err
+			}
+
+			i.TextLT = &t
+		case "textLTE":
+			t, err := graphql.UnmarshalString(v)
+			if err != nil {
+				return err
+			}
+
+			i.TextLTE = &t
+		case "textContains":
+			t, err := graphql.UnmarshalString(v)
+			if err != nil {
+				return err
+			}
+
+			i.TextContains = &t
+		case "textHasPrefix":
+			t, err := graphql.UnmarshalString(v)
+			if err != nil {
+				return err
+			}
+
+			i.TextHasPrefix = &t
+		case "textHasSuffix":
+			t, err := graphql.UnmarshalString(v)
+			if err != nil {
+				return err
+			}
+
+			i.TextHasSuffix = &t
+		case "textEqualFold":
+			t, err := graphql.UnmarshalString(v)
+			if err != nil {
+				return err
+			}
+
+			i.TextEqualFold = &t
+		case "textContainsFold":
+			t, err := graphql.UnmarshalString(v)
+			if err != nil {
+				return err
+			}
+
+			i.TextContainsFold = &t
+
+		// "parent" edge predicates.
+		case "hasParent":
+			t, err := graphql.UnmarshalBoolean(v)
+			if err != nil {
+				return err
+			}
+			i.HasParent = &t
+		case "hasParentWith":
+			i.HasParentWith, err = unmarshalGQLSlideTodoWhereInput(v)
+			if err != nil {
+				return err
+			}
+		// "children" edge predicates.
+		case "hasChildren":
+			t, err := graphql.UnmarshalBoolean(v)
+			if err != nil {
+				return err
+			}
+			i.HasChildren = &t
+		case "hasChildrenWith":
+			i.HasChildrenWith, err = unmarshalGQLSlideTodoWhereInput(v)
+			if err != nil {
+				return err
+			}
+		// "category" edge predicates.
+		case "hasCategory":
+			t, err := graphql.UnmarshalBoolean(v)
+			if err != nil {
+				return err
+			}
+			i.HasCategory = &t
+		case "hasCategoryWith":
+			i.HasCategoryWith, err = unmarshalGQLSlideCategoryWhereInput(v)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+// MarshalGQL implements the graphql.Marshaler interface
+//
+// This function should never be called because our object is Input.
+// It exists to make GQLGen aware of objects has custom unmarshal function
+func (i TodoWhereInput) MarshalGQL(w io.Writer) {
+	panic("TodoWhereInput.MarshalGQL not implemented")
+}
+
 // UserWhereInput represents a where input for filtering User queries.
 type UserWhereInput struct {
 	Not *UserWhereInput   `json:"not,omitempty"`
@@ -1049,4 +2199,235 @@ func (i *UserWhereInput) P() (predicate.User, error) {
 	default:
 		return user.And(predicates...), nil
 	}
+}
+
+func unmarshalGQLSlideUserWhereInput(v interface{}) (r []*UserWhereInput, err error) {
+	s := graphql.CoerceList(v)
+	r = make([]*UserWhereInput, len(s))
+	for i, o := range s {
+		r[i] = new(UserWhereInput)
+		if err = r[i].UnmarshalGQL(o); err != nil {
+			return nil, err
+		}
+	}
+	return
+}
+
+// UnmarshalGQL implements the graphql.Unmarshaler interface
+func (i *UserWhereInput) UnmarshalGQL(obj interface{}) (err error) {
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "not":
+			i.Not = new(UserWhereInput)
+			if err = i.Not.UnmarshalGQL(v); err != nil {
+				return err
+			}
+		case "or":
+			i.Or, err = unmarshalGQLSlideUserWhereInput(v)
+			if err != nil {
+				return err
+			}
+		case "and":
+			i.And, err = unmarshalGQLSlideUserWhereInput(v)
+			if err != nil {
+				return err
+			}
+		// "id" field predicates.
+		case "id":
+			g, err := (v)
+			if err != nil {
+				return err
+			}
+			t := (uuid.UUID)(g)
+
+			i.ID = &t
+		case "idNEQ":
+			g, err := (v)
+			if err != nil {
+				return err
+			}
+			t := (uuid.UUID)(g)
+
+			i.IDNEQ = &t
+		case "idIn":
+			i.IDIn = make([]uuid.UUID, len(v.([]interface{})))
+			for idx, o := range v.([]interface{}) {
+				g, err := (o)
+				if err != nil {
+					return err
+				}
+				t := (uuid.UUID)(g)
+
+				i.IDIn[idx] = t
+			}
+		case "idNotIn":
+			i.IDNotIn = make([]uuid.UUID, len(v.([]interface{})))
+			for idx, o := range v.([]interface{}) {
+				g, err := (o)
+				if err != nil {
+					return err
+				}
+				t := (uuid.UUID)(g)
+
+				i.IDNotIn[idx] = t
+			}
+		case "idGT":
+			g, err := (v)
+			if err != nil {
+				return err
+			}
+			t := (uuid.UUID)(g)
+
+			i.IDGT = &t
+		case "idGTE":
+			g, err := (v)
+			if err != nil {
+				return err
+			}
+			t := (uuid.UUID)(g)
+
+			i.IDGTE = &t
+		case "idLT":
+			g, err := (v)
+			if err != nil {
+				return err
+			}
+			t := (uuid.UUID)(g)
+
+			i.IDLT = &t
+		case "idLTE":
+			g, err := (v)
+			if err != nil {
+				return err
+			}
+			t := (uuid.UUID)(g)
+
+			i.IDLTE = &t
+		// "name" field predicates.
+		case "name":
+			t, err := graphql.UnmarshalString(v)
+			if err != nil {
+				return err
+			}
+
+			i.Name = &t
+		case "nameNEQ":
+			t, err := graphql.UnmarshalString(v)
+			if err != nil {
+				return err
+			}
+
+			i.NameNEQ = &t
+		case "nameIn":
+			i.NameIn = make([]string, len(v.([]interface{})))
+			for idx, o := range v.([]interface{}) {
+				t, err := graphql.UnmarshalString(o)
+				if err != nil {
+					return err
+				}
+
+				i.NameIn[idx] = t
+			}
+		case "nameNotIn":
+			i.NameNotIn = make([]string, len(v.([]interface{})))
+			for idx, o := range v.([]interface{}) {
+				t, err := graphql.UnmarshalString(o)
+				if err != nil {
+					return err
+				}
+
+				i.NameNotIn[idx] = t
+			}
+		case "nameGT":
+			t, err := graphql.UnmarshalString(v)
+			if err != nil {
+				return err
+			}
+
+			i.NameGT = &t
+		case "nameGTE":
+			t, err := graphql.UnmarshalString(v)
+			if err != nil {
+				return err
+			}
+
+			i.NameGTE = &t
+		case "nameLT":
+			t, err := graphql.UnmarshalString(v)
+			if err != nil {
+				return err
+			}
+
+			i.NameLT = &t
+		case "nameLTE":
+			t, err := graphql.UnmarshalString(v)
+			if err != nil {
+				return err
+			}
+
+			i.NameLTE = &t
+		case "nameContains":
+			t, err := graphql.UnmarshalString(v)
+			if err != nil {
+				return err
+			}
+
+			i.NameContains = &t
+		case "nameHasPrefix":
+			t, err := graphql.UnmarshalString(v)
+			if err != nil {
+				return err
+			}
+
+			i.NameHasPrefix = &t
+		case "nameHasSuffix":
+			t, err := graphql.UnmarshalString(v)
+			if err != nil {
+				return err
+			}
+
+			i.NameHasSuffix = &t
+		case "nameEqualFold":
+			t, err := graphql.UnmarshalString(v)
+			if err != nil {
+				return err
+			}
+
+			i.NameEqualFold = &t
+		case "nameContainsFold":
+			t, err := graphql.UnmarshalString(v)
+			if err != nil {
+				return err
+			}
+
+			i.NameContainsFold = &t
+
+		// "groups" edge predicates.
+		case "hasGroups":
+			t, err := graphql.UnmarshalBoolean(v)
+			if err != nil {
+				return err
+			}
+			i.HasGroups = &t
+		case "hasGroupsWith":
+			i.HasGroupsWith, err = unmarshalGQLSlideGroupWhereInput(v)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+// MarshalGQL implements the graphql.Marshaler interface
+//
+// This function should never be called because our object is Input.
+// It exists to make GQLGen aware of objects has custom unmarshal function
+func (i UserWhereInput) MarshalGQL(w io.Writer) {
+	panic("UserWhereInput.MarshalGQL not implemented")
 }

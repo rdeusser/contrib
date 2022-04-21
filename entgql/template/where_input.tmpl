@@ -15,6 +15,10 @@ in the LICENSE file in the root directory of this source tree.
 
 {{ template "import" $ }}
 
+import (
+    "github.com/99designs/gqlgen/graphql"
+)
+
 {{ range $n := filterNodes $.Nodes (skipMode "where_input") }}
     {{ $comparableFields := list $n.ID }}
     {{ $names := nodePaginationNames $n }}
@@ -186,5 +190,132 @@ in the LICENSE file in the root directory of this source tree.
             return {{ $n.Package }}.And(predicates...), nil
         }
     }
+
+    func unmarshalGQLSlide{{ $input }}(v interface{}) (r []*{{ $input }}, err error) {
+        s := graphql.CoerceList(v)
+        r = make([]*{{ $input }}, len(s))
+        for i, o := range s {
+            r[i] = new({{ $input }})
+            if err = r[i].UnmarshalGQL(o); err != nil {
+                return nil, err
+            }
+        }
+        return
+    }
+
+    // UnmarshalGQL implements the graphql.Unmarshaler interface
+    func (i *{{ $input }}) UnmarshalGQL(obj interface{}) (err error) {
+        asMap := map[string]interface{}{}
+        for k, v := range obj.(map[string]interface{}) {
+            asMap[k] = v
+        }
+
+        for k, v := range asMap {
+            switch k {
+            case "not":
+                i.Not = new({{ $input }})
+                if err = i.Not.UnmarshalGQL(v); err != nil {
+                    return err
+                }
+            {{- range $op := list "Or" "And" }}
+            case "{{ camel $op }}":
+                i.{{ $op }}, err = unmarshalGQLSlide{{ $input }}(v)
+                if err != nil {
+                    return err
+                }
+            {{- end }}
+
+            {{- range $f := $comparableFields }}
+            {{- $unmarshaler := unmarshaler $f }}
+            // "{{ $f.Name }}" field predicates.
+                {{- range $op := $f.Ops }}
+                    {{- $field := print $f.StructField $op.Name }}
+                    {{- $jsonTag := print $f.Name "_" $op.Name }}
+                    {{- /* We name the field filter "<Field>EQ()" as "<Field>()", because it's cleaner (e.g. "name_eq" -> "name") */}}
+                    {{- if eq $op.Name "EQ" }}
+                        {{- $field = $f.StructField }}
+                        {{- $jsonTag = $f.Name }}
+                    {{- end }}
+            case "{{ camel $jsonTag }}":
+                    {{- $type := $f.Type }}
+                    {{- if $op.Niladic }}
+                i.{{ $field }}, err = graphql.UnmarshalBoolean(v)
+                if err != nil {
+                    return err
+                }
+                    {{- else }}
+                        {{- $isPtr := or $f.Type.RType.IsPtr $unmarshaler.BuiltIn }}
+                        {{- if $op.Variadic }}
+                            i.{{ $field }} = make([]{{ $type }}, len(v.([]interface{})))
+                            for idx, o := range v.([]interface{}) {
+                                {{- with extend $n "Field" $f "Unmarshaler" $unmarshaler "Input" "o" }}
+                                    {{- template "gql_where_input/helper/unmarshaler" . }}
+                                {{- end }}
+                                i.{{ $field }}[idx] = {{ if $isPtr }}*{{ end }}t
+                            }
+                        {{- else }}
+                            {{- with extend $n "Field" $f "Unmarshaler" $unmarshaler "Input" "v" }}
+                                {{- template "gql_where_input/helper/unmarshaler" . }}
+                            {{- end }}
+                            i.{{ $field }} = {{ if not $isPtr }}&{{ end }}t
+                        {{- end }}
+                    {{- end }}
+                {{- end }}
+            {{- end }}
+
+            {{ range $e := filterEdges $n.Edges (skipMode "where_input") }}
+                {{- $field := print "Has" $e.StructField }}
+                {{- $jsonTag := print "has_" $e.Name }}
+            // "{{ $e.Name }}" edge predicates.
+            case "{{ camel $jsonTag }}":
+                t, err := graphql.UnmarshalBoolean(v)
+                if err != nil {
+                    return err
+                }
+                i.{{ $field }} = &t
+                {{- $field = print $field "With" }}
+                {{- $jsonTag = print $jsonTag "_with" }}
+            case "{{ camel $jsonTag }}":
+                {{- $names := nodePaginationNames $e.Type }}
+                i.{{ $field }}, err = unmarshalGQLSlide{{ $names.WhereInput }}(v)
+                if err != nil {
+                    return err
+                }
+                {{- end }}
+            }
+        }
+        return nil
+    }
+
+    // MarshalGQL implements the graphql.Marshaler interface
+    //
+    // This function should never be called because our object is Input.
+    // It exists to make GQLGen aware of objects has custom unmarshal function
+    func (i {{ $input }}) MarshalGQL(w io.Writer) {
+        panic("{{ $input }}.MarshalGQL not implemented")
+    }
+{{- end }}
+{{ end }}
+
+{{ define "gql_where_input/helper/unmarshaler" }}
+{{- $unmarshaler := $.Scope.Unmarshaler }}
+{{- $field := $.Scope.Field }}
+{{- $input := $.Scope.Input }}
+{{- if $unmarshaler.BuiltIn }}
+t := new({{ $unmarshaler.Type }})
+if err = t.UnmarshalGQL({{ $input }}); err != nil {
+    return err
+}
+{{- else if $field.HasGoType }}
+g, err := {{ $unmarshaler.UnmarshalFunc }}({{ $input }})
+if err != nil {
+    return err
+}
+t := ({{ $unmarshaler.Type }})(g)
+{{- else }}
+t, err := {{ $unmarshaler.UnmarshalFunc }}({{ $input }})
+if err != nil {
+    return err
+}
 {{- end }}
 {{ end }}

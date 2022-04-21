@@ -18,8 +18,10 @@ import (
 	"embed"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
+	"reflect"
 	"strings"
 	"text/template"
 	"text/template/parse"
@@ -27,6 +29,15 @@ import (
 	"entgo.io/ent/entc/gen"
 	"entgo.io/ent/schema/field"
 	"github.com/vektah/gqlparser/v2/ast"
+)
+
+type (
+	_Marshaler interface {
+		MarshalGQL(w io.Writer)
+	}
+	_Unmarshaler interface {
+		UnmarshalGQL(v interface{}) error
+	}
 )
 
 var (
@@ -69,15 +80,21 @@ var (
 		"fieldCollections":    fieldCollections,
 		"filterEdges":         filterEdges,
 		"filterFields":        filterFields,
-		"orderFields":         orderFields,
 		"filterNodes":         filterNodes,
 		"findIDType":          findIDType,
-		"nodePaginationNames": nodePaginationNames,
-		"skipMode":            skipModeFromString,
-		"isSkipMode":          isSkipMode,
-		"isRelayConn":         isRelayConn,
+		"hasMarshalGQL":       hasMarshalGQL,
+		"hasUnmarshalGQL":     hasUnmarshalGQL,
 		"hasWhereInput":       hasWhereInput,
+		"isRelayConn":         isRelayConn,
+		"isSkipMode":          isSkipMode,
+		"nodePaginationNames": nodePaginationNames,
+		"orderFields":         orderFields,
+		"skipMode":            skipModeFromString,
+		"unmarshaler":         unmarshaler,
 	}
+
+	marshalerType   = reflect.TypeOf((*_Marshaler)(nil)).Elem()
+	unmarshalerType = reflect.TypeOf((*_Unmarshaler)(nil)).Elem()
 
 	//go:embed template/*
 	templates embed.FS
@@ -87,6 +104,14 @@ func parseT(path string) *gen.Template {
 	return gen.MustParse(gen.NewTemplate(path).
 		Funcs(TemplateFuncs).
 		ParseFS(templates, path))
+}
+
+func hasMarshalGQL(t *field.TypeInfo) bool {
+	return t.RType.Implements(marshalerType)
+}
+
+func hasUnmarshalGQL(t *field.TypeInfo) bool {
+	return t.RType.Implements(unmarshalerType)
 }
 
 // findIDType returns the type of the ID field of the given type.
@@ -212,6 +237,46 @@ func hasWhereInput(n *gen.Edge) (v bool, err error) {
 		return false, err
 	}
 	return true, nil
+}
+
+type Unmarshaler struct {
+	BuiltIn       bool
+	Type          string
+	unmarshalFunc string
+}
+
+func (u Unmarshaler) UnmarshalFunc() string {
+	return u.unmarshalFunc
+}
+
+func unmarshaler(f *gen.Field) (*Unmarshaler, error) {
+	r := &Unmarshaler{
+		Type: f.Type.String(),
+	}
+	if f.IsEnum() || f.Type.RType.Implements(unmarshalerType) {
+		r.BuiltIn = true
+		return r, nil
+	}
+
+	switch f.Type.Type {
+	case field.TypeBool:
+		r.unmarshalFunc = "graphql.UnmarshalBoolean"
+	case field.TypeFloat32, field.TypeFloat64:
+		r.unmarshalFunc = "graphql.UnmarshalFloat"
+	case field.TypeString:
+		r.unmarshalFunc = "graphql.UnmarshalString"
+	case field.TypeTime:
+		r.unmarshalFunc = "graphql.UnmarshalTime"
+	case field.TypeInt, field.TypeInt32, field.TypeInt64,
+		field.TypeUint, field.TypeUint32, field.TypeUint64:
+		r.unmarshalFunc = "graphql.Unmarshal" + strings.Title(f.Type.Type.String())
+	case field.TypeInt8, field.TypeInt16:
+		r.unmarshalFunc = "graphql.UnmarshalInt"
+	case field.TypeUint8, field.TypeUint16:
+		r.unmarshalFunc = "graphql.UnmarshalUint"
+	}
+
+	return r, nil
 }
 
 // skipModeFromString returns SkipFlag from a string
