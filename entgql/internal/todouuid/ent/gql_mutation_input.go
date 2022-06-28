@@ -17,9 +17,49 @@
 package ent
 
 import (
+	"time"
+
+	"entgo.io/contrib/entgql/internal/todo/ent/schema/schematype"
+	"entgo.io/contrib/entgql/internal/todouuid/ent/category"
 	"entgo.io/contrib/entgql/internal/todouuid/ent/todo"
 	"github.com/google/uuid"
 )
+
+// CreateCategoryInput represents a mutation input for creating categories.
+type CreateCategoryInput struct {
+	Text     string
+	Status   category.Status
+	Config   *schematype.CategoryConfig
+	Duration *time.Duration
+	Count    *uint64
+	Strings  *[]string
+	TodoIDs  []uuid.UUID
+}
+
+// Mutate applies the CreateCategoryInput on the CategoryMutation builder.
+func (i *CreateCategoryInput) Mutate(m *CategoryMutation) {
+	m.SetText(i.Text)
+	m.SetStatus(i.Status)
+	m.SetConfig(i.Config)
+	if v := i.Duration; v != nil {
+		m.SetDuration(*v)
+	}
+	if v := i.Count; v != nil {
+		m.SetCount(*v)
+	}
+	if v := i.Strings; v != nil {
+		m.SetStrings(*v)
+	}
+	if v := i.TodoIDs; len(v) > 0 {
+		m.AddTodoIDs(v...)
+	}
+}
+
+// SetInput applies the change-set in the CreateCategoryInput on the CategoryCreate builder.
+func (c *CategoryCreate) SetInput(i CreateCategoryInput) *CategoryCreate {
+	i.Mutate(c.Mutation())
+	return c
+}
 
 // CreateTodoInput represents a mutation input for creating todos.
 type CreateTodoInput struct {
